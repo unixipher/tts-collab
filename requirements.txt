@@ -1,0 +1,13 @@
+# Core dependencies
+flask>=2.3.0
+numpy>=1.24.0
+torch>=2.0.0
+
+# Hugging Face TTS dependencies
+parler-tts @ git+https://github.com/huggingface/parler-tts.git
+transformers>=4.30.0
+
+# Optional production server dependencies
+# Uncomment the one you want to use:
+# gunicorn>=21.0.0  # For production deployment (Linux/Mac)
+# waitress>=2.1.0   # For production deployment (cross-platform)

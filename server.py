@@ -19,17 +19,18 @@ torch.set_num_threads(os.cpu_count())
 torch.set_num_interop_threads(os.cpu_count())
 print(f"PyTorch configured to use {os.cpu_count()} CPU threads")
 
-# --- 👇 DEFINE YOUR LOCAL MODEL PATH HERE ---
-# Based on your directory structure, the path is "./tts"
-LOCAL_MODEL_PATH = "./tts" 
+# --- 👇 DEFINE YOUR MODEL PATH HERE ---
+# Using AI4Bharat's Indic Parler TTS model (supports Indian languages)
+# Change to local path like "./tts" if you have the model downloaded locally
+MODEL_PATH = "ai4bharat/indic-parler-tts"
 
-print(f"Loading Hugging Face TTS model from: {LOCAL_MODEL_PATH}")
+print(f"Loading Hugging Face TTS model from: {MODEL_PATH}")
 _device = "cuda:0" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {_device}")
 
-# --- 👇 LOAD FROM YOUR LOCAL PATH ---
+# --- LOAD MODEL ---
 _model = ParlerTTSForConditionalGeneration.from_pretrained(
-    LOCAL_MODEL_PATH,
+    MODEL_PATH,
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,  # Use FP16 on GPU for speed
     low_cpu_mem_usage=True,  # Optimize memory usage
 ).to(_device)
@@ -50,7 +51,7 @@ torch.backends.cuda.matmul.allow_tf32 = True  # Enable TF32 on Ampere GPUs
 torch.backends.cudnn.allow_tf32 = True
 
 _tokenizer = AutoTokenizer.from_pretrained(
-    LOCAL_MODEL_PATH
+    MODEL_PATH
 )
 # ---
 _sample_rate = _model.config.sampling_rate
@@ -75,7 +76,8 @@ def synthesize():
         with torch.inference_mode():
             # 1. Define prompt and description
             prompt = text
-            description = "Divya's voice is monotone yet slightly fast in delivery, with a very close recording that almost has no background noise." # You can customize this
+            # Default description for Indic Parler TTS - customize for different voices/languages
+            description = data.get('description', "A clear, natural voice with moderate pace and good pronunciation.")
 
             # 2. Tokenize inputs
             input_ids = _tokenizer(
